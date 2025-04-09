@@ -1,0 +1,20 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV["DATABASE_USERNAME"] %>
+  password: <%= ENV["DATABASE_PASSWORD"] %>
+
+development:
+  <<: *default
+  database: api_sagu_development
+
+test:
+  <<: *default
+  database: api_sagu_test
+
+production:
+  <<: *default
+  database: api_sagu_production
+  username: api_sagu
+  password: <%= ENV["API_SAGU_DATABASE_PASSWORD"] %>

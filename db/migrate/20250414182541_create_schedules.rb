@@ -1,7 +1,7 @@
 class CreateSchedules < ActiveRecord::Migration[7.1]
   def change
     create_table :schedules, id: :uuid do |t|
-      t.timestamps :starts_at, null: false
+      t.datetime :starts_at, null: false
       t.string :subject
       t.string :area
       t.string :status

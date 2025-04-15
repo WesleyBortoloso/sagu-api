@@ -15,5 +15,5 @@ class Schedule < ApplicationRecord
     rejected: 2
   }
 
-  validates :date, :subject, :area, :status, presence: true
+  validates :starts_at, :subject, :area, :status, presence: true
 end

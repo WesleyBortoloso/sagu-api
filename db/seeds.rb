@@ -80,7 +80,7 @@ Authorization.create!(
 )
 
 Schedule.create!(
-  date: Date.tomorrow,
+  starts_at: Date.tomorrow,
   subject: 'Parent Meeting',
   area: 1,
   status: 0,

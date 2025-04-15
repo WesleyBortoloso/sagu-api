@@ -11,4 +11,5 @@ class Student < User
   has_many :authorizations, dependent: :destroy
   has_many :orientations, dependent: :destroy
   has_many :schedules, dependent: :destroy
+  has_many :documents, dependent: :destroy
 end

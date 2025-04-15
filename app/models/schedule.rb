@@ -3,8 +3,17 @@ class Schedule < ApplicationRecord
   belongs_to :student, class_name: 'Student'
   belongs_to :relator, class_name: 'User'
 
-  enum :area, { academic: 'academic', administrative: 'administrative' }
-  enum :status, { open: 'open', completed: 'completed', canceled: 'canceled' }
+  enum :area, {
+    academic: 0,
+    administrative: 1,
+    pedagogic: 2
+  }
+
+  enum :status, {
+    waiting: 0,
+    confirmed: 1,
+    rejected: 2
+  }
 
   validates :date, :subject, :area, :status, presence: true
 end

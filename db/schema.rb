@@ -56,7 +56,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_185624) do
     t.string "title", null: false
     t.string "description"
     t.string "kind", null: false
-    t.string "area", null: false
+    t.string "severity", null: false
     t.string "status"
     t.string "priority"
     t.uuid "student_id", null: false
@@ -86,6 +86,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_185624) do
     t.string "status"
     t.uuid "parent_id", null: false
     t.uuid "relator_id", null: false
+    t.uuid "student_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -125,4 +126,5 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_14_185624) do
   add_foreign_key "orientations", "users", column: "student_id"
   add_foreign_key "schedules", "users", column: "parent_id"
   add_foreign_key "schedules", "users", column: "relator_id"
+  add_foreign_key "schedules", "users", column: "student_id"
 end

@@ -10,4 +10,5 @@ class Student < User
   has_many :occurrencies, dependent: :nullify, inverse_of: :student
   has_many :authorizations, dependent: :destroy
   has_many :orientations, dependent: :destroy
+  has_many :schedules, dependent: :destroy
 end

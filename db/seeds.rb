@@ -52,9 +52,9 @@ parent = Parent.create!(
 occurrency = Occurrency.create!(
   title: 'Disciplinary Issue',
   description: 'Student was disruptive',
-  kind: 'Behavioral',
-  area: 'Classroom',
-  status: 'Open',
+  kind: 0,
+  status: 0,
+  severity: 1,
   student: student,
   relator: teacher,
   responsible: staff
@@ -74,7 +74,7 @@ orientation = Orientation.create!(
 Authorization.create!(
   date: Date.current,
   description: 'Field Trip Approval',
-  status: 'Approved',
+  status: 1,
   student: student,
   parent: parent
 )
@@ -82,8 +82,9 @@ Authorization.create!(
 Schedule.create!(
   date: Date.tomorrow,
   subject: 'Parent Meeting',
-  area: 'Administration',
-  status: 'Scheduled',
+  area: 1,
+  status: 0,
+  student: student,
   parent: parent,
   relator: staff
 )

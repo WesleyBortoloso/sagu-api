@@ -24,7 +24,10 @@ gem 'devise-jwt'
 gem 'grape'
 gem 'grape-swagger'
 
+gem 'jsonb_accessor'
+
 group :development, :test do
+  gem 'byebug'
   gem 'debug', platforms: %i[mri windows]
 end
 

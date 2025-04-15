@@ -86,6 +86,7 @@ GEM
     bootsnap (1.18.4)
       msgpack (~> 1.2)
     builder (3.3.0)
+    byebug (12.0.0)
     concurrent-ruby (1.3.5)
     connection_pool (2.5.0)
     crass (1.0.6)
@@ -152,6 +153,10 @@ GEM
     json (2.10.2)
     jsonapi-serializer (2.2.0)
       activesupport (>= 4.2)
+    jsonb_accessor (1.4)
+      activerecord (>= 6.1)
+      activesupport (>= 6.1)
+      pg (>= 0.18.1)
     jwt (2.10.1)
       base64
     language_server-protocol (3.17.0.4)
@@ -278,6 +283,8 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     securerandom (0.4.1)
+    store_base_sti_class (3.3.0)
+      activerecord (>= 6.1, < 7.3)
     stringio (3.1.6)
     thor (1.3.2)
     timeout (0.4.3)
@@ -304,6 +311,7 @@ PLATFORMS
 
 DEPENDENCIES
   bootsnap
+  byebug
   debug
   devise
   devise-jwt
@@ -311,6 +319,7 @@ DEPENDENCIES
   grape
   grape-swagger
   jsonapi-serializer
+  jsonb_accessor
   pg (~> 1.1)
   puma (>= 5.0)
   rack-cors
@@ -318,6 +327,7 @@ DEPENDENCIES
   rubocop
   rubocop-performance
   rubocop-rails
+  store_base_sti_class
   tzinfo-data
 
 RUBY VERSION

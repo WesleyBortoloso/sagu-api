@@ -15,16 +15,10 @@ class Occurrency < ApplicationRecord
   }
 
   enum :severity, {
-    low: 0,
+    normal: 0,
     medium: 1,
     high: 2,
     critical: 3
-  }
-
-  enum :priority, {
-    low: 0,
-    medium: 1,
-    high: 2
   }
 
   enum :status, {

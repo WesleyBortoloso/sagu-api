@@ -4,6 +4,7 @@ class Api < Grape::API
   format :json
 
   helpers AuthHelpers
+  helpers JsonapiFiltering
 
   rescue_from Errors::MissingUser do |e|
     error!({ error: 'Unauthorized', detail: e.message }, 401)

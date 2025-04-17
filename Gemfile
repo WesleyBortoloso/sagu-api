@@ -26,6 +26,9 @@ gem 'grape-swagger'
 
 gem 'jsonb_accessor'
 
+gem 'ransack'
+gem 'kaminari'
+
 group :development, :test do
   gem 'byebug'
   gem 'debug', platforms: %i[mri windows]

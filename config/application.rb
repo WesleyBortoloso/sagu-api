@@ -40,6 +40,8 @@ module ApiSagu
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
     config.paths.add 'app/api', eager_load: true
+    config.eager_load_paths << Rails.root.join('lib/poros')
+    config.eager_load_paths << Rails.root.join('app/interactions')
     config.autoload_paths += %W[#{config.root}/app/api]
     config.api_only = true
   end

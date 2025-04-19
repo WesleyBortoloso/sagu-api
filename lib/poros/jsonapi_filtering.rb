@@ -3,15 +3,14 @@ module JsonapiFiltering
 
   included do
     def apply_filters(scope, allowed_filters = [])
-      return scope unless params[:filter].is_a?(ActionController::Parameters)
+      return scope unless params[:filter].is_a?(Hash)
 
       ransack_filters = {}
       params[:filter].each do |key, value|
         next unless allowed_filters.include?(key.to_sym)
 
-        ransack_filters["\#{key}_eq"] = value
+        ransack_filters["#{key}_eq"] = value
       end
-
       scope.ransack(ransack_filters).result(distinct: true)
     end
 

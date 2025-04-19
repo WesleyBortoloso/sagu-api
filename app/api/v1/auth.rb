@@ -1,7 +1,16 @@
 module V1
   class Auth < Grape::API
+
+    helpers do
+      def serialize(resource)
+        UserSerializer.new(
+          resource
+        )
+      end
+    end
+
     resource :auth do
-      desc 'User authentication', {
+      desc 'User login', {
         success: { model: UserSerializer, message: 'Token generated successfuly' }
       }
       params do
@@ -16,6 +25,14 @@ module V1
           token: result[:token],
           data: UserSerializer.new(result[:user]).serializable_hash[:data]
         }
+      end
+
+      desc 'Logout user'
+      delete :logout do
+        raise Errors::MissingUser unless current_user
+        env['warden'].logout
+
+        status 204
       end
     end
   end

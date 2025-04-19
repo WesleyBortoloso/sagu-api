@@ -12,7 +12,7 @@ class V1::Occurrencies < Grape::API
   end
 
   resource :occurrencies do
-    desc 'List occurrencies'
+    desc 'List all occurrencies'
     get do
       scope = apply_filters(Occurrency.all, %i[kind area status title])
       occurrencies, meta = apply_pagination(scope)

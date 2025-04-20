@@ -17,6 +17,7 @@ gem 'dotenv-rails'
 gem 'jsonapi-serializer'
 
 gem 'rack-cors'
+gem 'rack-attack'
 
 gem 'devise'
 gem 'devise-jwt'

@@ -30,5 +30,15 @@ class Api < Grape::API
     error!({ error: 'Internal server error', detail: e.message }, 500)
   end
 
+  before do
+    error!('Unauthorized - Invalid API Key', 401) unless valid_api_key?
+  end
+  
+  helpers do
+    def valid_api_key?
+      headers['X-API-KEY'] == ENV['MY_API_KEY']
+    end
+  end  
+
   mount V1::Base
 end

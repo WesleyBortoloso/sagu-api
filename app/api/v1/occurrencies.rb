@@ -19,5 +19,24 @@ class V1::Occurrencies < Grape::API
 
       present serialize(occurrencies, meta)
     end
+
+    desc "Create an occurrency"
+    params do
+      requires :title, type: String, desc: "Ocurrency title"
+      requires :description, type: String, desc: "Ocurrency description"
+      requires :kind, type: String, values: Occurrency.kinds.keys, desc: "Ocurrency kind"
+      requires :status, type: String, values: Occurrency.statuses.keys, desc: "Ocurrency status"
+      requires :severity, type: String, values: Occurrency.severities.keys, desc: "Ocurrency severity"
+      requires :student_id, type: String, desc: "Related student"
+      requires :responsible_id, type: String, desc: "Related responsible"
+    end
+
+    post do
+      result = Occurrency::Create.call(declared(params), current_user: current_user)
+
+      present OccurrencySerializer.new(
+        result, include: [:student, :relator, :responsible, :events]
+      )
+    end
   end
 end

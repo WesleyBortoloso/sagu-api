@@ -1,3 +1,19 @@
+name: CI/CD Pipeline for Ruby on Rails
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
         env:
           POSTGRES_USER: ${{ secrets.DATABASE_USERNAME }}
           POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
@@ -29,10 +45,8 @@
         docker-compose -f docker-compose.ci.yml run --rm web bundle exec rspec
 
     - name: Deploy to EC2
-      if: github.ref == 'refs/heads/main'
-      run: |
-        ssh -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-          cd /path/to/your/app
+      if: github.ref == 'refs/heads/main'                                                                                                                                                                              run: |
+        ssh -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }} << 'EOF'                                                                                                                                        cd /path/to/your/app
           docker-compose pull
           docker-compose up -d
         EOF

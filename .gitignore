@@ -11,6 +11,11 @@
 /.env*
 !/.env*.erb
 
+# Ignore arquivos de certificados e chaves
+*.key
+*.cert
+*.crt
+
 # Ignore all logfiles and tempfiles.
 /log/*
 /tmp/*

@@ -29,12 +29,18 @@ jobs:
     - name: Set up Ruby
       uses: ruby/setup-ruby@v1
       with:
-        ruby-version: '3.2.2'
+        ruby-version: '3.x'
 
     - name: Install dependencies
       run: |
         gem install bundler
         bundle install
+
+    - name: Install Docker Compose
+      run: |
+        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        chmod +x /usr/local/bin/docker-compose
+        docker-compose --version  # Verificar se a instalação foi bem-sucedida
 
     - name: Build Docker image
       run: |
@@ -47,7 +53,7 @@ jobs:
     - name: Deploy to EC2
       if: github.ref == 'refs/heads/master'
       run: |
-        ssh -o StrictHostKeyChecking=no -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
+        ssh -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
           cd /path/to/your/app
           docker-compose pull
           docker-compose up -d

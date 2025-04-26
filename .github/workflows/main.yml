@@ -49,29 +49,29 @@ jobs:
           docker images | grep "${{ needs.setup.outputs.ecr_repo }}"
 
   deploy:
-  needs: build
-  runs-on: ubuntu-latest
-  steps:
-    - name: Configure AWS CLI
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+    needs: build   # <- corrigido
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS CLI
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Verify ECR repository
-      run: |
-        echo "ECR Repository: ${{ needs.setup.outputs.ecr_repo }}"
-        [ -z "${{ needs.setup.outputs.ecr_repo }}" ] && { echo "Error: ECR repository is empty"; exit 1; } || true
+      - name: Verify ECR repository
+        run: |
+          echo "ECR Repository: ${{ needs.setup.outputs.ecr_repo }}"
+          [ -z "${{ needs.setup.outputs.ecr_repo }}" ] && { echo "Error: ECR repository is empty"; exit 1; } || true
 
-    - name: Login to Amazon ECR
-      run: |
-        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-    - name: Push Docker image to ECR
-      run: |
-        echo "Pushing image to: ${{ needs.setup.outputs.ecr_repo }}:latest"
-        docker push "${{ needs.setup.outputs.ecr_repo }}:latest"
+      - name: Push Docker image to ECR
+        run: |
+          echo "Pushing image to: ${{ needs.setup.outputs.ecr_repo }}:latest"
+          docker push "${{ needs.setup.outputs.ecr_repo }}:latest"
 
   test_ssh:
     needs: deploy

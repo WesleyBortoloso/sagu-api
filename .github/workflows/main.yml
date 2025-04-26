@@ -34,7 +34,7 @@ jobs:
         run: docker-compose -f docker-compose.yml build
 
       - name: Tag Docker image
-        run: docker tag sagu-api-web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+        run: docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
       - name: Push Docker image to ECR
         run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest

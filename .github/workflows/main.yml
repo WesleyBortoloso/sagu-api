@@ -39,25 +39,22 @@ jobs:
       - name: Push Docker image to ECR
         run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
+      - name: Install SSH client
+        run: sudo apt-get install -y openssh-client
+
+      - name: Set up SSH key
+        run: |
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
       - name: Test SSH connection
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          port: 22
-          script: |
-            echo "Testing SSH connection..."
-            uptime
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} "echo 'Testing SSH connection...'; uptime"
 
       - name: SSH into EC2 and deploy
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          port: 22
-          script: |
+        run: |
+          ssh -i private_key.pem -o StrictHostKeyChecking=no ubuntu@${{ secrets.EC2_PUBLIC_IP }} << 'EOF'
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker-compose up --pull always --force-recreate --detach
+          EOF

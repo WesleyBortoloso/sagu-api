@@ -27,4 +27,4 @@ jobs:
             echo "=== Docker Info ==="
             docker --version || echo "Docker não instalado"
           debug: true  # Mostra logs detalhados
-          timeout: 30s
+          timeout: 60s

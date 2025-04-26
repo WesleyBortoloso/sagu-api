@@ -46,6 +46,8 @@ jobs:
         run: |
           docker-compose -f docker-compose.yml build
           docker tag sagu-api-web:latest ${{ needs.setup.outputs.ecr_repo }}:latest
+          echo "Image tagged as: ${{ needs.setup.outputs.ecr_repo }}:latest"
+          docker images
 
   deploy:
     needs: build
@@ -60,6 +62,7 @@ jobs:
 
       - name: Push Docker image to ECR
         run: |
+          echo "Pushing image to: ${{ needs.setup.outputs.ecr_repo }}:latest"
           docker push ${{ needs.setup.outputs.ecr_repo }}:latest
 
   test_ssh:
@@ -75,7 +78,7 @@ jobs:
           port: 22
           script: |
             echo "✅ SSH Connection Successful"
-            echo "Verificando docker-compose.yml..."
+            echo "Current directory: $(pwd)"
             ls -la /home/ubuntu/sagu-api/docker-compose.yml
             uptime
 
@@ -95,6 +98,8 @@ jobs:
             cd /home/ubuntu/sagu-api
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker-compose -f /home/ubuntu/sagu-api/docker-compose.yml up --pull always --force-recreate --detach
+            docker-compose down
+            docker-compose up --pull always --force-recreate --detach
             echo "🎉 Deployment completed!"
+            echo "Running containers:"
             docker ps

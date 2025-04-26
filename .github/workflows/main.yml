@@ -9,7 +9,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      ecr_repo: 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api
+      ecr_repo: ${{ steps.set_output.outputs.ecr_repo }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -24,6 +24,10 @@ jobs:
       - name: Login to Amazon ECR
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: Set ECR repo output
+        id: set_output
+        run: echo "ecr_repo=042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api" >> $GITHUB_OUTPUT
 
   build:
     needs: setup
@@ -55,7 +59,8 @@ jobs:
           aws-region: us-east-1
 
       - name: Push Docker image to ECR
-        run: docker push ${{ needs.setup.outputs.ecr_repo }}:latest
+        run: |
+          docker push ${{ needs.setup.outputs.ecr_repo }}:latest
 
   test_ssh:
     needs: deploy
@@ -70,6 +75,8 @@ jobs:
           port: 22
           script: |
             echo "✅ SSH Connection Successful"
+            echo "Verificando docker-compose.yml..."
+            ls -la /home/ubuntu/sagu-api/docker-compose.yml
             uptime
 
   deploy_to_ec2:
@@ -85,7 +92,9 @@ jobs:
           port: 22
           script: |
             echo "🚀 Starting deployment..."
+            cd /home/ubuntu/sagu-api
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker-compose up --pull always --force-recreate --detach
+            docker-compose -f /home/ubuntu/sagu-api/docker-compose.yml up --pull always --force-recreate --detach
             echo "🎉 Deployment completed!"
+            docker ps

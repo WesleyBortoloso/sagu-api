@@ -42,33 +42,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Connect to EC2 and Login to ECR (with debug)
+      - name: Connect to EC2 and Login to ECR
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
-          debug: true   # <-- DEBUG ATIVADO
           script: |
             echo "Conexão estabelecida com sucesso no EC2"
             uname -a
             whoami
             echo "Testando conectividade com AWS ECR..."
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
   deploy:
     needs: connect
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy application on EC2 (with debug)
+      - name: Deploy application on EC2
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
-          debug: true 
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }

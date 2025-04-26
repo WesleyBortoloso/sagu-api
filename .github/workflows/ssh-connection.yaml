@@ -1,29 +1,28 @@
-name: SSH Connection Test
+name: Conectar ao EC2 via SSH
 
 on:
-  workflow_dispatch:  # Permite acionar manualmente pelo GitHub UI
+  push:
+    branches:
+      - main
 
 jobs:
-  test-ssh:
+  ssh-ec2:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout (opcional)
-        uses: actions/checkout@v4  # Não é necessário para o teste SSH, mas mantido por conveniência
 
-      - name: Test SSH Connection with Debug
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}  # Passando a chave diretamente
-          port: 22
-          script: |
-            echo "✅ Conexão SSH bem-sucedida!"
-            echo "=== Informações do servidor ==="
-            uname -a
-            echo "=== Uptime ==="
-            uptime
-            echo "=== Docker Info ==="
-            docker --version || echo "Docker não instalado"
-          debug: true  # Mostra logs detalhados
-          timeout: 60s
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v2
+
+    - name: Configurar chave SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" > ~/.ssh/id_rsa  # Chave privada do EC2 armazenada no Secrets do GitHub
+        chmod 600 ~/.ssh/id_rsa  # Ajusta as permissões da chave privada para segurança
+
+    - name: Adicionar IP da instância EC2 ao known_hosts
+      run: |
+        ssh-keyscan -H ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts  # Adiciona o IP da instância EC2 ao arquivo known_hosts
+
+    - name: Conectar via SSH ao EC2
+      run: |
+        ssh -i ~/.ssh/id_rsa ubuntu@${{ secrets.EC2_PUBLIC_IP }} "echo 'Conectado com sucesso ao EC2!'"

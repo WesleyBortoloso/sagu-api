@@ -5,28 +5,23 @@ class Occurrency < ApplicationRecord
   has_many :events, as: :eventable, dependent: :destroy
 
   enum :kind, {
-    behavior: 0,
-    discipline: 1,
-    delay: 2,
-    absence: 3,
-    academic: 4,
-    administrative: 5,
-    other: 99
+    health: 'Saúde',
+    discipline: 'Disciplinar',
+    administrative: 'Administrativa',
+    other: 'Outra'
   }
 
   enum :severity, {
-    normal: 0,
-    medium: 1,
-    high: 2,
-    critical: 3
+    normal: 'Normal',
+    medium: 'Média',
+    high: 'Alta'
   }
 
   enum :status, {
-    open: 0,
-    in_progress: 1,
-    resolved: 2,
-    closed: 3,
-    canceled: 4
+    open: 'Aberta',
+    in_progress: 'Em progresso',
+    resolved: 'Resolvida',
+    closed: 'Fechada'
   }
 
   validate :valid_relator_responsible

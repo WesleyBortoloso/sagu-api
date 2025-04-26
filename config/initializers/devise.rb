@@ -19,7 +19,7 @@ Devise.setup do |config|
     jwt.secret = ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.devise_jwt_secret_key
     jwt.dispatch_requests = [['POST', %r{^/api/v1/auth/login$}]]
     jwt.revocation_requests = [['DELETE', %r{^/api/v1/auth/logout$}]]
-    jwt.expiration_time = 2.hours.to_i
+    jwt.expiration_time = 1.hours.to_i
   end
   # ==> Controller configuration
   # Configure the parent class to the devise controllers.

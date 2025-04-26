@@ -4,16 +4,34 @@ class Schedule < ApplicationRecord
   belongs_to :relator, class_name: 'User'
 
   enum :area, {
-    academic: 0,
-    administrative: 1,
-    pedagogic: 2
+    academic: 'Acadêmica',
+    administrative: 'Administrativa',
+    pedagogic: 'Pedagógica'
   }
 
   enum :status, {
-    waiting: 0,
-    confirmed: 1,
-    rejected: 2
+    waiting: 'Aguardando',
+    confirmed: 'Confirmada',
+    rejected: 'Rejeitada'
   }
 
   validates :starts_at, :subject, :area, :status, presence: true
+  validate :must_be_afternoon
+  validate :no_time_conflict
+
+  def must_be_afternoon
+    hour = scheduled_at.hour
+    unless (13..18).include?(hour)
+      errors.add(:scheduled_at, "só permite agendamento entre 13h e 18h")
+    end
+  end
+
+  def no_time_conflict
+    conflict = Schedule.where(relator: relator, scheduled_at: scheduled_at)
+    conflict = conflict.where.not(id: id) if persisted?
+
+    if conflict.exists?
+      errors.add(:scheduled_at, "já reservado para este horário")
+    end
+  end
 end

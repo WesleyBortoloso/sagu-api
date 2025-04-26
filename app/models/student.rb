@@ -16,8 +16,8 @@ class Student < User
   validates :enrollment, :situation, presence: true
 
   enum :situation, {
-    active: 0,
-    inactive: 1,
-    in_process: 2
+    active: 'Ativo',
+    inactive: 'Inativo',
+    in_process: 'Em processo'
   }
 end

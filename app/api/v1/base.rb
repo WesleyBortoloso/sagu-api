@@ -10,5 +10,7 @@ module V1
     mount V1::Schedules
     mount V1::Orientations
     mount V1::Classrooms
+    mount V1::Dashboard
+    mount V1::Events
   end
 end

@@ -51,7 +51,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
-          use_insecure_cipher: true
           script: |
             cd /path/to/your/app
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com

@@ -15,4 +15,4 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
           ARGS: "-rlgoDzvc -i"
           REMOTE_HOST: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          REMOTE_USER: ${{ secrets.AWS_USER }}
+          REMOTE_USER: ubuntu

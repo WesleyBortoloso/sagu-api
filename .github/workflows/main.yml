@@ -1,68 +1,46 @@
-name: CI/CD Pipeline for Ruby on Rails
+name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - master
-  pull_request:
     branches:
       - master
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:13
-        env:
-          POSTGRES_USER: ${{ secrets.DATABASE_USERNAME }}
-          POSTGRES_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          POSTGRES_DB: ${{ secrets.DATABASE_NAME }}
-        ports:
-          - 5432:5432
-        options: --health-cmd="pg_isready -U $POSTGRES_USER" --health-timeout=5s --health-start-period=5s --health-retries=3
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: '3.2.2'
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
-    - name: Install Docker Compose
-      run: |
-        curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-        chmod +x /usr/local/bin/docker-compose
-        docker-compose --version  # Verificar se a instalação foi bem-sucedida
+      - name: Build Docker image
+        run: docker-compose -f docker-compose.yml build
 
-    - name: Build Docker image
-      run: |
-        docker build -t my-rails-app .
+      - name: Tag Docker image
+        run: docker tag my-rails-app:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
-    - name: Run tests
-      run: |
-        docker-compose -f docker-compose.ci.yml run --rm web bundle exec rspec
+      - name: Push Docker image to ECR
+        run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
-    - name: Deploy to EC2
-      if: github.ref == 'refs/heads/master'
-      run: |
-        ssh -i ${{ secrets.EC2_SSH_KEY }} ec2-user@${{ secrets.EC2_HOST }} << 'EOF'
-          cd /path/to/your/app
-          docker-compose pull
-          docker-compose up -d
-        EOF
-      env:
-        DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
-        DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-        DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
-        DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        SECRET_KEY_BASE: ${{ secrets.SECRET_KEY_BASE }}
-        MY_API_KEY: ${{ secrets.MY_API_KEY }}
+      - name: SSH into EC2 and deploy
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ec2-user
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd /path/to/your/app
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+            docker-compose up -d

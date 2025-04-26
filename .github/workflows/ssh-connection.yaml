@@ -74,7 +74,7 @@ jobs:
           debug: true 
           script: |
             echo "Indo para a pasta da aplicação..."
-            cd /path/to/your/app || { echo "Falha ao acessar o diretório"; exit 1; }
+            cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
             echo "Atualizando container com a nova imagem..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker-compose up -d

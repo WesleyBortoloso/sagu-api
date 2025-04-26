@@ -1,0 +1,29 @@
+name: SSH Connection Test
+
+on:
+  workflow_dispatch:  # Permite acionar manualmente pelo GitHub UI
+
+jobs:
+  test-ssh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (opcional)
+        uses: actions/checkout@v4  # Não é necessário para o teste SSH, mas mantido por conveniência
+
+      - name: Test SSH Connection with Debug
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "✅ Conexão SSH bem-sucedida!"
+            echo "=== Informações do servidor ==="
+            uname -a
+            echo "=== Uptime ==="
+            uptime
+            echo "=== Docker Info ==="
+            docker --version || echo "Docker não instalado"
+          debug: true  # Mostra logs detalhados
+          timeout: 30s

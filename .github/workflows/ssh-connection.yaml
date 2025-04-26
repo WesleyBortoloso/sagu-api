@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Configure AWS Credentials
+      - name: Set up AWS CLI
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -24,13 +24,19 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker-compose --version
+
       - name: Build Docker image
         run: docker-compose -f docker-compose.yml build
 
       - name: Tag Docker image
         run: docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
-      - name: Push Docker image
+      - name: Push Docker image to ECR
         run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
   connect:
@@ -38,15 +44,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Connect to EC2
-        uses: easingthemes/ssh-deploy@v2.2.11
+      - name: Connect to EC2 and Login to ECR (with debug)
+        uses: appleboy/ssh-action@v0.1.0
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          REMOTE_HOST: ubuntu@${{ secrets.EC2_PUBLIC_IP }}
-          SCRIPT_AFTER: |
-            echo "Conectado com sucesso."
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          debug: true   # <-- DEBUG ATIVADO
+          script: |
+            echo "Conexão estabelecida com sucesso no EC2"
             uname -a
             whoami
+            echo "Testando conectividade com AWS ECR..."
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
   deploy:
@@ -54,14 +64,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy application
-        uses: easingthemes/ssh-deploy@v2.2.11
+      - name: Deploy application on EC2 (with debug)
+        uses: appleboy/ssh-action@v0.1.0
         with:
-          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          REMOTE_HOST: ubuntu@${{ secrets.EC2_PUBLIC_IP }}
-          SCRIPT_AFTER: |
-            cd /path/to/your/app || { echo "Diretório não encontrado"; exit 1; }
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          debug: true 
+          script: |
+            echo "Indo para a pasta da aplicação..."
+            cd /path/to/your/app || { echo "Falha ao acessar o diretório"; exit 1; }
+            echo "Atualizando container com a nova imagem..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker-compose pull
-            docker-compose up -d --no-deps --build
+            docker-compose up -d
             echo "Deploy finalizado!"

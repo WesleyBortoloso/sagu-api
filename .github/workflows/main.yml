@@ -9,7 +9,7 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     outputs:
-      ecr_repo: ${{ steps.set_output.outputs.ecr_repo }}
+      ecr_repo: ${{ steps.set_ecr.outputs.repository }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -21,13 +21,12 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Login to Amazon ECR
+      - name: Set ECR repository output
+        id: set_ecr
         run: |
-          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
-
-      - name: Set ECR repo output
-        id: set_output
-        run: echo "ecr_repo=042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api" >> $GITHUB_OUTPUT
+          repository="042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api"
+          echo "repository=${repository}" >> $GITHUB_OUTPUT
+          echo "ECR Repository: ${repository}"
 
   build:
     needs: setup
@@ -42,28 +41,37 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker-compose --version
 
-      - name: Build and tag Docker image
+      - name: Build and verify Docker image
         run: |
           docker-compose -f docker-compose.yml build
           docker tag sagu-api-web:latest ${{ needs.setup.outputs.ecr_repo }}:latest
-          echo "Image tagged as: ${{ needs.setup.outputs.ecr_repo }}:latest"
-          docker images
+          echo "Image successfully tagged:"
+          docker images | grep "${{ needs.setup.outputs.ecr_repo }}"
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Configure AWS CLI
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Configure AWS CLI
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
 
-      - name: Push Docker image to ECR
-        run: |
-          echo "Pushing image to: ${{ needs.setup.outputs.ecr_repo }}:latest"
-          docker push ${{ needs.setup.outputs.ecr_repo }}:latest
+    - name: Verify ECR repository
+      run: |
+        echo "ECR Repository: ${{ needs.setup.outputs.ecr_repo }}"
+        [ -z "${{ needs.setup.outputs.ecr_repo }}" ] && { echo "Error: ECR repository is empty"; exit 1; } || true
+
+    - name: Login to Amazon ECR
+      run: |
+        aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
+    - name: Push Docker image to ECR
+      run: |
+        echo "Pushing image to: ${{ needs.setup.outputs.ecr_repo }}:latest"
+        docker push "${{ needs.setup.outputs.ecr_repo }}:latest"
 
   test_ssh:
     needs: deploy

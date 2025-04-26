@@ -1,18 +1,67 @@
-name: Node CI
+name: CI/CD Pipeline
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Connect to Server via SSH
-      uses: easingthemes/ssh-deploy@main
-      with:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
+      - name: Build Docker image
+        run: docker-compose -f docker-compose.yml build
+
+      - name: Tag Docker image
+        run: docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+
+      - name: Push Docker image
+        run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+
+  connect:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connect to EC2
+        uses: easingthemes/ssh-deploy@v2.2.11
+        with:
           SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
-          ARGS: "-rlgoDzvc -i"
-          REMOTE_HOST: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          REMOTE_USER: ${{ secrets.AWS_USER }}
+          REMOTE_HOST: ubuntu@${{ secrets.EC2_PUBLIC_IP }}
+          SCRIPT_AFTER: |
+            echo "Conectado com sucesso."
+            uname -a
+            whoami
+            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
+  deploy:
+    needs: connect
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application
+        uses: easingthemes/ssh-deploy@v2.2.11
+        with:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+          REMOTE_HOST: ubuntu@${{ secrets.EC2_PUBLIC_IP }}
+          SCRIPT_AFTER: |
+            cd /path/to/your/app || { echo "Diretório não encontrado"; exit 1; }
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+            docker-compose pull
+            docker-compose up -d --no-deps --build
+            echo "Deploy finalizado!"

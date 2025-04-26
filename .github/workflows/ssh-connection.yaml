@@ -15,7 +15,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
           username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}  # Passando a chave diretamente
           port: 22
           script: |
             echo "✅ Conexão SSH bem-sucedida!"

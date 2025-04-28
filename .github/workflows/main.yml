@@ -32,12 +32,11 @@ jobs:
 
       - name: Build images using Docker Compose
         run: |
-          docker compose -f docker-compose.yml build
+          docker compose --env-file .env -f docker-compose.yml build
 
       - name: Push Docker images to ECR
         run: |
-          docker compose push web
-          docker compose push nginx
+          docker compose --env-file .env -f docker-compose.yml push
 
   connect:
     needs: build

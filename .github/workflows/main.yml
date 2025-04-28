@@ -25,10 +25,7 @@ jobs:
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
       - name: Build Docker images
-        run: docker compose -f docker-compose.yml build
-
-      - name: Tag Docker images
-        run: docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+        run: docker compose build
 
       - name: Push Docker image to ECR
         run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
@@ -65,10 +62,7 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
-            echo "Atualizando containers com a nova imagem..."
-            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker compose pull
             docker compose up -d
             echo "Deploy finalizado!"

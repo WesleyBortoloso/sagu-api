@@ -29,7 +29,7 @@ jobs:
 
       - name: Tag API Docker image
         run: |
-          docker tag sagu-api:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+          docker tag sagu-api-web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
       - name: Push API Docker image to ECR
         run: |

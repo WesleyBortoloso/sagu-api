@@ -1,0 +1,15 @@
+services:
+  nginx:
+    image: 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+    container_name: sagu-nginx
+    ports:
+      - "80:80"
+    restart: always
+    depends_on:
+      - sagu-api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    external: true

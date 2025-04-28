@@ -36,7 +36,8 @@ jobs:
 
       - name: Push Docker images to ECR
         run: |
-          docker compose -f docker-compose.yml push
+          docker compose push web
+          docker compose push nginx
 
   connect:
     needs: build
@@ -73,6 +74,7 @@ jobs:
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
             echo "Atualizando containers com a nova imagem..."
-            docker compose pull  # Atualiza as imagens
-            docker compose up -d  # Levanta a API e o nginx
-            echo "Deploy finalizado!"
+            docker compose pull
+            docker image prune -f
+            docker compose up -d
+            echo "Deploy finalizado com sucesso!"

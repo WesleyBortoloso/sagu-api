@@ -26,8 +26,7 @@ jobs:
 
       - name: Build Docker images
         run: |
-          docker compose -f docker-compose.api.yml build
-          docker compose -f docker-compose.nginx.yml build
+          docker compose -f docker-compose.yml build
 
       - name: Tag Docker images
         run: |

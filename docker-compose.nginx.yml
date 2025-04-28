@@ -1,5 +1,7 @@
 services:
   nginx:
+    build:
+      context: ./nginx
     image: 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
     container_name: sagu-nginx
     ports:

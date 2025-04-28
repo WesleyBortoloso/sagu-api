@@ -1,15 +1,27 @@
 services:
   web:
-    image: 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-    container_name: sagu-api
-    restart: always
+    build: .
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -b '0.0.0.0'"
+    volumes:
+      - .:/app
     ports:
       - "3000:3000"
-    env_file:
-      - .env
-    networks:
-      - app-network
+    environment:
+      RAILS_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      SECRET_KEY_BASE: ${SECRET_KEY_BASE}
+      MY_API_KEY: ${MY_API_KEY}
+    depends_on:
+      - db
 
-networks:
-  app-network:
-    driver: bridge
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

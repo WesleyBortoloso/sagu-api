@@ -38,5 +38,21 @@ class V1::Occurrencies < Grape::API
         result, include: [:student, :relator, :responsible, :events]
       )
     end
+
+    desc 'Show details of a specific occurrency'
+    params do
+      requires :id, type: String, desc: 'Occurrency UUID'
+    end
+
+    route_param :id do
+      get do
+        occurrency = Occurrency.find(params[:id])
+
+        present OccurrencySerializer.new(
+          occurrency,
+          include: [:relator, :responsible, :student, :events]
+        )
+      end
+    end
   end
 end

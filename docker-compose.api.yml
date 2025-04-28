@@ -1,0 +1,15 @@
+services:
+  web:
+    image: 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+    container_name: sagu-api
+    restart: always
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

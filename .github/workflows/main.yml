@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build:
+  build_api:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,21 +27,47 @@ jobs:
       - name: Build API Docker image
         run: docker compose -f docker-compose.api.yml build
 
+      - name: Tag API Docker image
+        run: |
+          docker tag sagu-api:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+
+      - name: Push API Docker image to ECR
+        run: |
+          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+
+  build_nginx:
+    runs-on: ubuntu-latest
+    needs: build_api  # Certificando-se que o build da API foi concluído antes de iniciar o build do NGINX
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up AWS CLI
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Log in to Amazon ECR
+        run: |
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+
       - name: Build NGINX Docker image
         run: docker compose -f docker-compose.nginx.yml build
 
-      - name: Tag Docker images
+      - name: Tag NGINX Docker image
         run: |
-          docker tag sagu-api:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
           docker tag sagu-nginx:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
-      - name: Push Docker images to ECR
+      - name: Push NGINX Docker image to ECR
         run: |
-          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
           docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
   connect:
-    needs: build
+    needs: [build_api, build_nginx]  # Espera o build de ambos os containers
+
     runs-on: ubuntu-latest
 
     steps:
@@ -74,17 +100,13 @@ jobs:
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Diretório não encontrado"; exit 1; }
-
             echo "Atualizando imagens..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
-
             echo "Derrubando containers antigos..."
             docker compose -f docker-compose.api.yml down
             docker compose -f docker-compose.nginx.yml down
-
             echo "Subindo containers atualizados..."
             docker compose -f docker-compose.api.yml up -d
             docker compose -f docker-compose.nginx.yml up -d
-
             echo "Deploy finalizado!"

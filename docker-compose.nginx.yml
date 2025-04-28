@@ -6,7 +6,7 @@ services:
       - "80:80"
     restart: always
     depends_on:
-      - sagu-api
+      - sagu-api-web
     networks:
       - app-network
 

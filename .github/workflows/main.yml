@@ -23,9 +23,16 @@ jobs:
       - name: Log in to Amazon ECR
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
-
+      - name: Install Docker Compose
+        run: |
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          docker compose --version
       - name: Build Docker images
-        run: docker compose build
+        run: docker compose -f docker-compose.yml build
+
+      - name: Tag Docker images
+        run: docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
       - name: Push Docker image to ECR
         run: docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
@@ -48,7 +55,6 @@ jobs:
             whoami
             echo "Testando conectividade com AWS ECR..."
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
-
   deploy:
     needs: connect
     runs-on: ubuntu-latest
@@ -62,7 +68,10 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
+            echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
-            docker compose pull
-            docker compose up -d
+            echo "Atualizando containers com a nova imagem..."
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+            docker compose pull  # Para garantir que a imagem mais recente do Nginx e da API seja usada
+            docker compose up -d  # Levanta o serviço da API e do Nginx
             echo "Deploy finalizado!"

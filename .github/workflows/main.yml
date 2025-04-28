@@ -54,9 +54,9 @@ jobs:
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
             echo "Derrubando containers antigos..."
-            docker compose -f docker-compose-api.yml down
+            docker compose -f docker-compose.api.yml down
 
             echo "Subindo containers atualizados..."
-            docker compose -f docker-compose-api.yml up -d
+            docker compose -f docker-compose.api.yml up -d
 
             echo "Deploy finalizado!"

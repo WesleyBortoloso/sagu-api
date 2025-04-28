@@ -20,4 +20,12 @@ class Student < User
     inactive: 'Inativo',
     in_process: 'Em processo'
   }
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[name email document classroom_id]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[classrooms]
+  end
 end

@@ -42,7 +42,7 @@ class V1::Students < Grape::API
     end
 
     get do
-      scope = apply_filters(Student.all, %i[name email document])
+      scope = apply_filters(Student.all, %i[name email document classroom_id])
       paginated, meta = apply_pagination(scope)
 
       present serialize(paginated, meta)

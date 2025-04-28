@@ -24,9 +24,11 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Build Docker images
-        run: |
-          docker compose -f docker-compose.yml build
+      - name: Build API Docker image
+        run: docker-compose -f docker-compose.api.yml build
+
+      - name: Build NGINX Docker image
+        run: docker-compose -f docker-compose.nginx.yml build
 
       - name: Tag Docker images
         run: |

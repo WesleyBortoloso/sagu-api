@@ -24,18 +24,27 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Build and Push Docker image
+      - name: Build Docker images
         run: |
-          docker compose -f docker-compose.yml build
-          docker tag sagu-api-web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+          docker compose -f docker-compose.api.yml build
+          docker compose -f docker-compose.nginx.yml build
 
-  deploy:
+      - name: Tag Docker images
+        run: |
+          docker tag sagu-api:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+          docker tag sagu-nginx:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+
+      - name: Push Docker images to ECR
+        run: |
+          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+
+  connect:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: SSH and Deploy
+      - name: Connect to EC2 and login to ECR
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
@@ -44,19 +53,37 @@ jobs:
           port: 22
           debug: true
           script: |
-            echo "Conectando no EC2..."
-            cd /home/ubuntu/sagu-api || { echo "Diretório não encontrado"; exit 1; }
-
-            echo "Fazendo login no ECR..."
+            echo "Conectado no EC2!"
+            uname -a
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-            echo "Atualizando imagem..."
+  deploy:
+    needs: connect
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy application on EC2
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.EC2_PUBLIC_IP }}
+          username: ubuntu
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: 22
+          debug: true
+          script: |
+            echo "Indo para a pasta da aplicação..."
+            cd /home/ubuntu/sagu-api || { echo "Diretório não encontrado"; exit 1; }
+
+            echo "Atualizando imagens..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
             echo "Derrubando containers antigos..."
             docker compose -f docker-compose.api.yml down
+            docker compose -f docker-compose.nginx.yml down
 
             echo "Subindo containers atualizados..."
             docker compose -f docker-compose.api.yml up -d
+            docker compose -f docker-compose.nginx.yml up -d
 
             echo "Deploy finalizado!"

@@ -30,13 +30,21 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
           docker compose --version
 
-      - name: Build Docker image manually
+      - name: Build Docker image for API
         run: |
           docker build -t 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest .
 
-      - name: Push Docker image to ECR
+      - name: Push Docker image for API to ECR
         run: |
           docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+
+      - name: Build Docker image for Nginx
+        run: |
+              docker build -t 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest -f nginx/Dockerfile .
+
+      - name: Push Docker image for Nginx to ECR
+        run: |
+          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
   connect:
     needs: build
@@ -72,8 +80,9 @@ jobs:
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
-            echo "Atualizando containers com a nova imagem..."
+            echo "Atualizando containers com a nova imagem da API..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker compose pull  # Atualiza também o nginx se precisar
-            docker compose up -d  # Levanta a API e o nginx
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+            docker compose pull  # Atualiza a imagem do Nginx
+            docker compose up -d  # Levanta a API e o Nginx
             echo "Deploy finalizado!"

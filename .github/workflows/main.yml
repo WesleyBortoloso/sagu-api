@@ -24,27 +24,19 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Install Docker Compose
+      - name: Install Docker Compose (v2)
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker compose --version
+          docker-compose --version
 
-      - name: Build Docker image for API
+      - name: Build images using Docker Compose
         run: |
-          docker build -t 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest .
+          docker compose -f docker-compose.yml build
 
-      - name: Push Docker image for API to ECR
+      - name: Push Docker images to ECR
         run: |
-          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-
-      - name: Build Docker image for Nginx
-        run: |
-              docker build -t 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest -f nginx/Dockerfile .
-
-      - name: Push Docker image for Nginx to ECR
-        run: |
-          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+          docker compose -f docker-compose.yml push
 
   connect:
     needs: build
@@ -66,7 +58,7 @@ jobs:
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
   deploy:
-    needs: connect
+    needs: [connect]
     runs-on: ubuntu-latest
 
     steps:
@@ -80,9 +72,7 @@ jobs:
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
-            echo "Atualizando containers com a nova imagem da API..."
-            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
-            docker compose pull  # Atualiza a imagem do Nginx
-            docker compose up -d  # Levanta a API e o Nginx
+            echo "Atualizando containers com a nova imagem..."
+            docker compose pull  # Atualiza as imagens
+            docker compose up -d  # Levanta a API e o nginx
             echo "Deploy finalizado!"

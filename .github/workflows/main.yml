@@ -24,69 +24,39 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Install Docker Compose v2
+      - name: Build and Push Docker image
         run: |
-          sudo apt-get update
-          sudo apt-get install -y curl
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
-
-      - name: Build and Push API Docker image using Docker Compose
-        run: |
-          docker compose -f ./sagu-api/docker-compose.api.yml build
+          docker compose -f docker-compose.yml build
+          docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
           docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
-      - name: Build and Push Nginx Docker image using Docker Compose
-        run: |
-          docker compose -f ./sagu-api/docker-compose.nginx.yml build
-          docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
-
-  connect:
+  deploy:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Connect to EC2 and Login to ECR
+      - name: SSH and Deploy
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
           username: ubuntu
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
+          debug: true
           script: |
-            echo "Conexão estabelecida com sucesso no EC2"
-            uname -a
-            whoami
-            echo "Testando conectividade com AWS ECR..."
+            echo "Conectando no EC2..."
+            cd /home/ubuntu/sagu-api || { echo "Diretório não encontrado"; exit 1; }
+
+            echo "Fazendo login no ECR..."
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-  deploy:
-    needs: connect
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Deploy application on EC2
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.EC2_PUBLIC_IP }}
-          username: ubuntu
-          key: ${{ secrets.EC2_PRIVATE_KEY }}
-          port: 22
-          script: |
-            echo "Indo para a pasta da aplicação..."
-            cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
-
-            echo "Atualizando containers com a nova imagem..."
+            echo "Atualizando imagem..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
-            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
-            # Atualiza a imagem da API
-            docker compose -f ./sagu-api/docker-compose.api.yml pull
-            docker compose -f ./sagu-api/docker-compose.api.yml up -d  # Levanta a API
+            echo "Derrubando containers antigos..."
+            docker compose -f docker-compose-api.yml down
 
-            # Atualiza a imagem do Nginx
-            docker compose -f ./sagu-api/docker-compose.nginx.yml pull
-            docker compose -f ./sagu-api/docker-compose.nginx.yml up -d  # Levanta o Nginx
+            echo "Subindo containers atualizados..."
+            docker compose -f docker-compose-api.yml up -d
 
             echo "Deploy finalizado!"

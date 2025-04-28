@@ -27,7 +27,7 @@ jobs:
       - name: Build and Push Docker image
         run: |
           docker compose -f docker-compose.yml build
-          docker tag sagu-api_web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+          docker tag sagu-api-web:latest 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
           docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
 
   deploy:

@@ -19,5 +19,21 @@ class V1::Orientations < Grape::API
 
       present serialize(orientations, meta)
     end
+
+    desc 'Show details of a specific orientation'
+    params do
+      requires :id, type: String, desc: 'Orientation UUID'
+    end
+
+    route_param :id do
+      get do
+        orientation = Orientation.find(params[:id])
+
+        present OrientationSerializer.new(
+          orientation,
+          include: [:relator, :parent]
+        )
+      end
+    end
   end
 end

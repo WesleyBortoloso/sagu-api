@@ -76,9 +76,17 @@ jobs:
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
+
             echo "Atualizando containers com a nova imagem..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
-            docker compose -f docker-compose.yml pull  # Atualiza as imagens
-            docker compose -f docker-compose.yml up -d  # Levanta a API e o nginx
+
+            # Atualiza a imagem da API
+            docker compose -f ./sagu-api/docker-compose.api.yml pull
+            docker compose -f ./sagu-api/docker-compose.api.yml up -d  # Levanta a API
+
+            # Atualiza a imagem do Nginx
+            docker compose -f ./sagu-api/docker-compose.nginx.yml pull
+            docker compose -f ./sagu-api/docker-compose.nginx.yml up -d  # Levanta o Nginx
+
             echo "Deploy finalizado!"

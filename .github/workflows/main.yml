@@ -24,26 +24,13 @@ jobs:
         run: |
           aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-      - name: Install Docker Compose (v2)
+      - name: Install Docker Compose
         run: |
-          sudo curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
           sudo chmod +x /usr/local/bin/docker-compose
-          docker-compose --version
+          docker compose --version
 
-      - name: Build images using Docker Compose
-        run: |
-          docker compose --env-file .env -f docker-compose.yml build
-
-      - name: Push Docker images to ECR
-        run: |
-          docker compose --env-file .env -f docker-compose.yml push
-
-  connect:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Connect to EC2 and Login to ECR
+      - name: SSH into EC2 and Build Docker images
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
@@ -51,18 +38,20 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: 22
           script: |
-            echo "Conexão estabelecida com sucesso no EC2"
-            uname -a
-            whoami
-            echo "Testando conectividade com AWS ECR..."
-            aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
+            echo "Conectando ao EC2..."
+            cd /home/ubuntu/sagu-api  # Caminho onde o código está
+            git pull origin master  # Puxa as últimas mudanças
+            echo "Arquivo .env encontrado, pronto para build!"
+            echo "Iniciando o build das imagens..."
+            docker compose --env-file .env build  # Usa o .env do EC2
+            docker compose push  # Envia as imagens para o ECR
 
   deploy:
-    needs: [connect]
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy application on EC2
+      - name: SSH into EC2 and Deploy application
         uses: appleboy/ssh-action@v0.1.0
         with:
           host: ${{ secrets.EC2_PUBLIC_IP }}
@@ -73,7 +62,7 @@ jobs:
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Falha ao acessar o diretório"; exit 1; }
             echo "Atualizando containers com a nova imagem..."
-            docker compose pull
-            docker image prune -f
-            docker compose up -d
-            echo "Deploy finalizado com sucesso!"
+            docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
+            docker compose pull  # Atualiza o nginx se necessário
+            docker compose up -d  # Levanta a API e o nginx
+            echo "Deploy finalizado!"

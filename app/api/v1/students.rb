@@ -47,5 +47,9 @@ class V1::Students < Grape::API
 
       present serialize(paginated, meta)
     end
+
+    route_param :student_id do
+      mount V1::Students::Documents
+    end
   end
 end

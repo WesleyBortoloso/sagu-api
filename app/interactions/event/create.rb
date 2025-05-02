@@ -17,7 +17,8 @@ class Event::Create < BaseInteraction
     {
       eventable: params[:eventable],
       author: params[:user],
-      description: params[:description]
+      description: params[:description],
+      target: params[:target]
     }
   end
 end

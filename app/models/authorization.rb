@@ -9,4 +9,12 @@ class Authorization < ApplicationRecord
   }
 
   validates :date, :description, :status, presence: true
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[date status student_id]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[student]
+  end
 end

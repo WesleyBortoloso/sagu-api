@@ -14,10 +14,21 @@ class V1::Events < Grape::API
   resource :events do
     desc 'List all events'
     get do
-      scope = apply_filters(Event.all, %i[created_at author_id eventable_id])
+      current_user_events = Event.where("author_id = :id OR target_id = :id", id: current_user.id)
+                                 .order(created_at: :desc)
+      scope = apply_filters(current_user_events, %i[created_at author_id eventable_id])
       events, meta = apply_pagination(scope)
 
       present serialize(events, meta)
+    end
+
+    desc 'List notifications'
+    get :notifications do
+      events = Event.where(target: current_user)
+                    .order(created_at: :desc)
+                    .limit(5)
+
+      present EventSerializer.new(events)
     end
   end
 end

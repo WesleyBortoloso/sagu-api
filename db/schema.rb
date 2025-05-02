@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_29_002517) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_29_004436) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -96,6 +96,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_29_002517) do
     t.jsonb "metadata", default: {}
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "target_type"
+    t.uuid "target_id"
     t.index ["author_type", "author_id"], name: "index_events_on_author_type_and_author_id"
     t.index ["eventable_type", "eventable_id"], name: "index_events_on_eventable_type_and_eventable_id"
   end

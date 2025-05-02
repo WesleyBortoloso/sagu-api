@@ -15,7 +15,7 @@ class Occurrency::Create < BaseInteraction
   end
 
   def create_occurrency_event!
-    @event = Event::Create.call({eventable: occurrency, user: current_user, description: description})
+    @event = Event::Create.call({eventable: occurrency, user: current_user, description: description, target: occurrency.responsible})
   end
 
   def occurrency_params

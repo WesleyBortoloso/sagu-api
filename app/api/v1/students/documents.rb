@@ -26,6 +26,7 @@ class V1::Students::Documents < Grape::API
       requires :name, type: String, desc: 'Document name'
       requires :kind, type: String, desc: 'Document kind'
       requires :file, type: File, desc: 'PDF file to attach'
+      requires :student_id, type: String, desc: 'Student id'
     end
 
     post do

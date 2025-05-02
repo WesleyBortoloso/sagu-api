@@ -6,7 +6,6 @@ class Student::Document::Create < BaseInteraction
     validate_file_type!
     create_document!
     attach_file!
-
     document
   end
 
@@ -21,15 +20,23 @@ class Student::Document::Create < BaseInteraction
   end
 
   def attach_file!
+    file = params[:file][:tempfile]
+    file.rewind
+
     document.file.attach(
-      io: params[:file][:tempfile],
+      io: file,
       filename: params[:file][:filename],
       content_type: params[:file][:type]
     )
   end
 
   def validate_file_type!
-    error!({ error: 'Invalid file type', detail: 'Only PDF files are allowed' }, 422) unless params[:file][:type] == 'application/pdf'
+    unless params[:file][:type] == 'application/pdf'
+      error!(
+        { error: 'Invalid file type', detail: 'Only PDF files are allowed' },
+        422
+      )
+    end
   end
 
   def document_params

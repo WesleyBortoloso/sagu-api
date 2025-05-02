@@ -42,7 +42,7 @@ class V1::Students < Grape::API
     end
 
     get do
-      scope = apply_filters(Student.all, %i[name email document classroom_id])
+      scope = apply_filters(Student.all.order(name: :asc), %i[name email document classroom_id])
       paginated, meta = apply_pagination(scope)
 
       present serialize(paginated, meta)
@@ -50,6 +50,20 @@ class V1::Students < Grape::API
 
     route_param :student_id do
       mount V1::Students::Documents
+
+      desc 'Show details of a specific student'
+      params do
+        requires :student_id, type: String, desc: 'Student UUID'
+      end
+
+      get do
+        student = Student.find(params[:student_id])
+
+        present StudentSerializer.new(
+          student,
+          include: [:classroom, :parent]
+        )
+      end
     end
   end
 end

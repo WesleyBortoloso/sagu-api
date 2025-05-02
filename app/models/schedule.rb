@@ -34,4 +34,12 @@ class Schedule < ApplicationRecord
       errors.add(:scheduled_at, "já reservado para este horário")
     end
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    %w[area status starts_at student_id]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    %w[student]
+  end
 end

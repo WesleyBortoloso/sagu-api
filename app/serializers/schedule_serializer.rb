@@ -4,5 +4,6 @@ class ScheduleSerializer
   attributes :starts_at, :subject, :area, :status
 
   belongs_to :relator, serializer: UserSerializer
-  belongs_to :parent, serializer: ParentSerializer
+  belongs_to :parent
+  belongs_to :student
 end

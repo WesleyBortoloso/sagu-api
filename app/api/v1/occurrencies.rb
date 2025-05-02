@@ -14,7 +14,7 @@ class V1::Occurrencies < Grape::API
   resource :occurrencies do
     desc 'List all occurrencies'
     get do
-      scope = apply_filters(Occurrency.all, %i[kind area status title])
+      scope = apply_filters(Occurrency.all.order(created_at: :desc), %i[kind area status student_id])
       occurrencies, meta = apply_pagination(scope)
 
       present serialize(occurrencies, meta)

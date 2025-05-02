@@ -1,7 +1,7 @@
 class OccurrencySerializer
   include JSONAPI::Serializer
 
-  attributes :title, :description, :kind, :status
+  attributes :title, :description, :kind, :status, :severity, :created_at
 
   belongs_to :student
   belongs_to :relator, serializer: UserSerializer

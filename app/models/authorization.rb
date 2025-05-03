@@ -3,9 +3,9 @@ class Authorization < ApplicationRecord
   belongs_to :parent, class_name: 'Parent'
 
   enum :status, {
-    pending: 'Pendente',
-    approved: 'Aprovada',
-    denied: 'Recusada'
+    pending: 'pending',
+    approved: 'approved',
+    refused: 'refused'
   }
 
   validates :date, :description, :status, presence: true

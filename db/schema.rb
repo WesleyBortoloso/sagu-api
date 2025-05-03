@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_29_004436) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_03_012439) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -76,6 +76,20 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_29_004436) do
     t.uuid "classroom_id", null: false
     t.uuid "teacher_id", null: false
     t.index ["classroom_id", "teacher_id"], name: "index_classrooms_teachers_on_classroom_id_and_teacher_id", unique: true
+  end
+
+  create_table "conditions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "category", null: false
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "conditions_students", id: false, force: :cascade do |t|
+    t.uuid "student_id", null: false
+    t.uuid "condition_id", null: false
+    t.index ["student_id", "condition_id"], name: "index_conditions_students_on_student_id_and_condition_id", unique: true
   end
 
   create_table "documents", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -172,6 +186,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_29_004436) do
   add_foreign_key "authorizations", "users", column: "student_id"
   add_foreign_key "classrooms_teachers", "classrooms", on_delete: :cascade
   add_foreign_key "classrooms_teachers", "users", column: "teacher_id", on_delete: :cascade
+  add_foreign_key "conditions_students", "conditions"
+  add_foreign_key "conditions_students", "users", column: "student_id"
   add_foreign_key "documents", "users", column: "student_id"
   add_foreign_key "occurrencies", "users", column: "relator_id"
   add_foreign_key "occurrencies", "users", column: "responsible_id"

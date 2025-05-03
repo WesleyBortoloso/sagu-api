@@ -12,13 +12,14 @@ class Student < User
   has_many :orientations, dependent: :destroy
   has_many :schedules, dependent: :destroy
   has_many :documents, class_name: '::Document', dependent: :destroy
+  has_and_belongs_to_many :conditions, join_table: 'conditions_students'
 
   validates :enrollment, :situation, presence: true
 
   enum :situation, {
     active: 'Ativo',
-    inactive: 'Inativo',
-    in_process: 'Em processo'
+    inactive: 'inactive',
+    in_process: 'in_process'
   }
 
   def self.ransackable_attributes(auth_object = nil)
@@ -27,5 +28,13 @@ class Student < User
 
   def self.ransackable_associations(auth_object = nil)
     %w[classrooms]
+  end
+
+  def scholarships
+    conditions.scholarship
+  end
+
+  def special_needs
+    conditions.special_need
   end
 end

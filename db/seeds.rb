@@ -103,4 +103,9 @@ Event.create!(
   metadata: { scheduled_for: Date.tomorrow }
 )
 
+Condition.find_or_create_by!(name: 'TEA', category: 'special_need')
+Condition.find_or_create_by!(name: 'Deficiência Visual', category: 'special_need')
+Condition.find_or_create_by!(name: 'Bolsa 100%', category: 'scholarship')
+Condition.find_or_create_by!(name: 'Bolsa Transporte', category: 'scholarship')
+
 Rails.logger.debug('Seeds created successfully!')

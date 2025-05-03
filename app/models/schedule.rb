@@ -10,9 +10,9 @@ class Schedule < ApplicationRecord
   }
 
   enum :status, {
-    waiting: 'Aguardando',
-    confirmed: 'Confirmada',
-    rejected: 'Rejeitada'
+    waiting: 'waiting',
+    confirmed: 'confirmed',
+    rejected: 'rejected'
   }
 
   validates :starts_at, :subject, :area, :status, presence: true

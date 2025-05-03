@@ -61,7 +61,7 @@ class V1::Students < Grape::API
 
         present StudentSerializer.new(
           student,
-          include: [:classroom, :parent]
+          include: [:classroom, :parent, :conditions]
         )
       end
     end

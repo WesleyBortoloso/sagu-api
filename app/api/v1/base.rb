@@ -12,5 +12,6 @@ module V1
     mount V1::Classrooms
     mount V1::Dashboard
     mount V1::Events
+    mount V1::Conditions
   end
 end

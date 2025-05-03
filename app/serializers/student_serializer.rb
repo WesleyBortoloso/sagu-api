@@ -10,4 +10,5 @@ class StudentSerializer
   has_many :orientations
   has_many :schedules
   has_many :documents
+  has_many :conditions
 end

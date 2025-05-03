@@ -20,16 +20,11 @@ class V1::Orientations < Grape::API
       present serialize(orientations, meta)
     end
 
-    desc 'Show details of a specific orientation'
-    params do
-      requires :orientation_id, type: String, desc: 'Orientation UUID'
-    end
-
     desc "Create an orientation"
     params do
       requires :title, type: String, desc: "Orientation title"
       requires :description, type: String, desc: "Orientation description"
-      requires :area, type: String, values: Orientation.kinds.keys, desc: "Orientation kind"
+      requires :area, type: String, desc: "Orientation area"
       requires :status, type: String, values: Orientation.statuses.keys, desc: "Orientation status"
       requires :student_id, type: String, desc: "Related student"
       requires :responsible_id, type: String, desc: "Related responsible"
@@ -42,6 +37,10 @@ class V1::Orientations < Grape::API
     end
 
     route_param :orientation_id do
+      desc 'Show details of a specific orientation'
+      params do
+        requires :orientation_id, type: String, desc: 'Orientation UUID'
+      end
       get do
         orientation = Orientation.find(params[:orientation_id])
 

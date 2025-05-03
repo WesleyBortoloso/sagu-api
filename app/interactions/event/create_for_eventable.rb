@@ -13,7 +13,7 @@ class Event::CreateForEventable < BaseInteraction
   def create_event!
     @event = Event.create!(
       eventable: @eventable,
-      author: params[:user],
+      author: current_user,
       description: params[:description]
     )
   end

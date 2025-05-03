@@ -20,11 +20,6 @@ class V1::Schedules < Grape::API
       present serialize(schedules, meta)
     end
 
-    desc 'Show details of a specific schedule'
-    params do
-      requires :schedule_id, type: String, desc: 'Schedule UUID'
-    end
-
     desc "Create an schedule"
     params do
       requires :starts_at, type: String, desc: "Schedule starts at"
@@ -40,18 +35,11 @@ class V1::Schedules < Grape::API
       present ScheduleSerializer.new(result)
     end
 
-    route_param :orientation_id do
-      get do
-        orientation = Orientation.find(params[:orientation_id])
-
-        present OrientationSerializer.new(
-          orientation,
-          include: [:relator, :parent, :events, :responsible, :student]
-        )
-      end
-    end
-
     route_param :schedule_id do
+      desc 'Show details of a specific schedule'
+      params do
+        requires :schedule_id, type: String, desc: 'Schedule UUID'
+      end
       get do
         schedule = Schedule.find(params[:schedule_id])
 

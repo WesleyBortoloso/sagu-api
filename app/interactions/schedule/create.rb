@@ -30,7 +30,7 @@ class Schedule::Create < BaseInteraction
   end
 
   def create_event!
-    @event = Event::Create.call({eventable: schedule, user: current_user, description: event_description, target: occurrency.responsible})
+    @event = Event::Create.call({eventable: schedule, user: current_user, description: event_description, target: schedule.parent})
   end
 
   def event_description

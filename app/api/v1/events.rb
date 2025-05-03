@@ -22,6 +22,19 @@ class V1::Events < Grape::API
       present serialize(events, meta)
     end
 
+    desc "Create an event"
+    params do
+      requires :eventable_id, type: String, desc: "Eventable UUID"
+      requires :eventable_type, type: String, desc: "Eventable Type"
+      requires :description, type: String, desc: "Event description"
+    end
+
+    post do
+      result = Event::CreateForEventable.call(declared(params), current_user: current_user)
+
+      present EventSerializer.new(result)
+    end
+
     desc 'List notifications'
     get :notifications do
       events = Event.where(target: current_user)

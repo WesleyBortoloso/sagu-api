@@ -25,6 +25,31 @@ class V1::Authorizations < Grape::API
       requires :authorization_id, type: String, desc: 'Authorization UUID'
     end
 
+    desc "Create an authorization"
+    params do
+      requires :date, type: String, desc: "Authorization starts at"
+      requires :description, type: String, desc: "Authorization subject"
+      requires :status, type: String, values: Authorization.statuses.keys, desc: "Authorization status"
+      requires :student_id, type: String, desc: "Related student"
+    end
+
+    post do
+      result = Authorization::Create.call(declared(params), current_user: current_user)
+
+      present AuthorizationSerializer.new(result)
+    end
+
+    route_param :orientation_id do
+      get do
+        orientation = Orientation.find(params[:orientation_id])
+
+        present OrientationSerializer.new(
+          orientation,
+          include: [:relator, :parent, :events, :responsible, :student]
+        )
+      end
+    end
+
     route_param :authorization_id do
       get do
         authorization = Authorization.find(params[:authorization_id])

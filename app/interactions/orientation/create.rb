@@ -10,17 +10,18 @@ class Orientation::Create < BaseInteraction
 
   private
 
+
   def create_orientation!
     @orientation = Orientation.create!(orientation_params.merge(relator_id: current_user.id))
   end
 
   def create_orientation_event!
-    @event = Event::Create.call({eventable: occurrency, user: current_user, description: description, target: occurrency.responsible})
+    @event = Event::Create.call({eventable: orientation, user: current_user, description: description, target: orientation.responsible})
   end
 
-  def occurrency_params
+  def orientation_params
     params.slice(
-      :title, :description, :kind, :area, :severity, :status, :student_id, :responsible_id
+      :title, :description, :area, :status, :student_id, :responsible_id
     )
   end
 
@@ -28,4 +29,3 @@ class Orientation::Create < BaseInteraction
     "Uma orientação foi atribuida a #{orientation.responsible.name} por #{orientation.relator.name}"
   end
 end
-

@@ -20,11 +20,6 @@ class V1::Authorizations < Grape::API
       present serialize(authorizations, meta)
     end
 
-    desc 'Show details of a specific authorization'
-    params do
-      requires :authorization_id, type: String, desc: 'Authorization UUID'
-    end
-
     desc "Create an authorization"
     params do
       requires :date, type: String, desc: "Authorization starts at"
@@ -39,24 +34,32 @@ class V1::Authorizations < Grape::API
       present AuthorizationSerializer.new(result)
     end
 
-    route_param :orientation_id do
-      get do
-        orientation = Orientation.find(params[:orientation_id])
-
-        present OrientationSerializer.new(
-          orientation,
-          include: [:relator, :parent, :events, :responsible, :student]
-        )
-      end
-    end
-
     route_param :authorization_id do
+      desc 'Show details of a specific authorization'
+      params do
+        requires :authorization_id, type: String, desc: 'Authorization UUID'
+      end
+
       get do
         authorization = Authorization.find(params[:authorization_id])
 
         present AuthorizationSerializer.new(
           authorization,
           include: [:student, :parent]
+        )
+      end
+
+      desc "Update an authorization"
+      params do
+        requires :authorization_id, type: String, desc: 'Authorization UUID'
+        optional :status, type: String, values: Authorization.statuses.keys, desc: 'Authorization status'
+      end
+
+      patch do
+        result = Authorization::Update.call(declared(params), current_user: current_user)
+    
+        present AuthorizationSerializer.new(
+          result, include: [:events]
         )
       end
     end

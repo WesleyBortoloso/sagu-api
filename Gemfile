@@ -26,6 +26,8 @@ gem 'grape'
 gem 'grape-swagger'
 
 gem 'jsonb_accessor'
+gem 'prawn'
+gem 'prawn-table'
 
 gem 'ransack'
 gem 'kaminari'

@@ -1,7 +1,8 @@
 class Orientation::Create < BaseInteraction
-  attr_reader :orientation, :event
+  attr_reader :orientation, :event, :student
 
   def call
+    find_student!
     create_orientation!
     create_orientation_event!
 
@@ -10,9 +11,12 @@ class Orientation::Create < BaseInteraction
 
   private
 
+  def find_student!
+    @student = Student.find(params[:student_id])
+  end
 
   def create_orientation!
-    @orientation = Orientation.create!(orientation_params.merge(relator_id: current_user.id))
+    @orientation = Orientation.create!(orientation_params.merge(relator_id: current_user.id, parent_id: student&.parent&.id))
   end
 
   def create_orientation_event!

@@ -21,7 +21,7 @@ class Schedule::Create < BaseInteraction
     @schedule = Schedule.create!(
       student: student,
       parent: student.parent,
-      relator: params[:user],
+      relator: current_user,
       starts_at: params[:starts_at],
       subject: params[:subject],
       area: params[:area],

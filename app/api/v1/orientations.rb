@@ -33,7 +33,7 @@ class V1::Orientations < Grape::API
     post do
       result = Orientation::Create.call(declared(params), current_user: current_user)
 
-      present OccurrencySerializer.new(result)
+      present OrientationSerializer.new(result)
     end
 
     route_param :orientation_id do
@@ -47,6 +47,22 @@ class V1::Orientations < Grape::API
         present OrientationSerializer.new(
           orientation,
           include: [:relator, :parent, :events, :responsible, :student]
+        )
+      end
+
+      desc "Update an orientation"
+      params do
+        requires :orientation_id, type: String, desc: 'Orientation UUID'
+        optional :area, type: String, values: Orientation.areas.keys, desc: 'Orientation area'
+        optional :status, type: String, values: Orientation.statuses.keys, desc: 'Orientation status'
+        optional :responsible_id, type: String, desc: 'Orientation responsible'
+      end
+    
+      patch do
+        result = Orientation::Update.call(declared(params), current_user: current_user)
+    
+        present OrientationSerializer.new(
+          result, include: [:responsible, :events]
         )
       end
     end

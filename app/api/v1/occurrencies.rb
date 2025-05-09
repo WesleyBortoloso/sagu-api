@@ -39,18 +39,34 @@ class V1::Occurrencies < Grape::API
       )
     end
 
-    desc 'Show details of a specific occurrency'
-    params do
-      requires :id, type: String, desc: 'Occurrency UUID'
-    end
-
-    route_param :id do
+    route_param :occurrency_id do
+      desc 'Show details of a specific occurrency'
+      params do
+        requires :occurrency_id, type: String, desc: 'Occurrency UUID'
+      end
       get do
-        occurrency = Occurrency.find(params[:id])
+        occurrency = Occurrency.find(params[:occurrency_id])
 
         present OccurrencySerializer.new(
           occurrency,
           include: [:relator, :responsible, :student, :events]
+        )
+      end
+
+      desc "Update an occurrency"
+      params do
+        requires :occurrency_id, type: String, desc: 'Occurrency UUID'
+        optional :kind, type: String, values: Occurrency.kinds.keys, desc: 'Occurrency kind'
+        optional :status, type: String, values: Occurrency.statuses.keys, desc: 'Occurrency status'
+        optional :severity, type: String, values: Occurrency.severities.keys, desc: 'Occurrency severity'
+        optional :responsible_id, type: String, desc: 'Occurrency responsible'
+      end
+    
+      patch do
+        result = Occurrency::Update.call(declared(params), current_user: current_user)
+    
+        present OccurrencySerializer.new(
+          result, include: [:responsible, :events]
         )
       end
     end

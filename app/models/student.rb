@@ -2,7 +2,7 @@ class Student < User
   jsonb_accessor :extra_info,
                  enrollment: :string,
                  external_id: :integer,
-                 situation: :integer
+                 situation: :string
 
   belongs_to :classroom, optional: true
   belongs_to :parent, class_name: 'Parent', optional: true
@@ -13,11 +13,12 @@ class Student < User
   has_many :schedules, dependent: :destroy
   has_many :documents, class_name: '::Document', dependent: :destroy
   has_and_belongs_to_many :conditions, join_table: 'conditions_students'
+  has_one_attached :report_file
 
-  validates :enrollment, :situation, presence: true
+  validates :enrollment, presence: true
 
   enum :situation, {
-    active: 'Ativo',
+    active: 'active',
     inactive: 'inactive',
     in_process: 'in_process'
   }

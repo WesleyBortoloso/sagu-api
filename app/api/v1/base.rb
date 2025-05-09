@@ -13,5 +13,6 @@ module V1
     mount V1::Dashboard
     mount V1::Events
     mount V1::Conditions
+    mount V1::Users
   end
 end

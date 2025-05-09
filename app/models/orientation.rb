@@ -1,6 +1,6 @@
 class Orientation < ApplicationRecord
   belongs_to :student, class_name: 'Student', inverse_of: :occurrencies
-  belongs_to :parent, class_name: 'Parent'
+  belongs_to :parent, class_name: 'Parent', optional: true
   belongs_to :relator, class_name: 'User'
   belongs_to :responsible, class_name: 'User'
   has_many :events, as: :eventable, dependent: :destroy
@@ -10,6 +10,12 @@ class Orientation < ApplicationRecord
     in_progress: 'in_progress',
     resolved: 'resolved',
     closed: 'closed'
+  }
+
+  enum :area, {
+    academic: 'academic',
+    administrative: 'administrative',
+    pedagogic: 'pedagogic'
   }
 
   validate :valid_relator_responsible

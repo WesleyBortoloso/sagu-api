@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_03_012439) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_07_233230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -136,7 +136,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_03_012439) do
     t.string "area"
     t.string "status"
     t.uuid "student_id", null: false
-    t.uuid "parent_id", null: false
+    t.uuid "parent_id"
     t.uuid "relator_id", null: false
     t.uuid "responsible_id", null: false
     t.datetime "created_at", null: false

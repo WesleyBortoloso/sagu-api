@@ -11,4 +11,13 @@ class StudentSerializer
   has_many :schedules
   has_many :documents
   has_many :conditions
+
+  attribute :report_url do |object|
+    if object.report_file.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(
+        object.report_file,
+        disposition: "inline"
+      )
+    end
+  end
 end

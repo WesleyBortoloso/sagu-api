@@ -64,6 +64,32 @@ class V1::Students < Grape::API
           include: [:classroom, :parent, :conditions]
         )
       end
+
+      desc 'Generate student report as PDF'
+      params do
+        requires :student_id, type: String, desc: 'Student UUID'
+      end
+
+      post '/report' do
+        result = Student::GenerateReport.call(declared(params))
+      
+        present StudentSerializer.new(result)
+      end
+
+      desc "Update an student"
+      params do
+        requires :student_id, type: String, desc: 'Student UUID'
+        optional :email, type: String, desc: 'Student email', regexp: URI::MailTo::EMAIL_REGEXP
+        optional :situation, type: String, values: Student.situations.keys, desc: 'Student situation'
+        optional :classroom_id, type: String, desc: 'Student classroom'
+        optional :phone, type: String, desc: 'Student phone', regexp: /^\d{10,11}$/
+      end
+    
+      patch do
+        result = Student::Update.call(declared(params), current_user: current_user)
+    
+        present StudentSerializer.new(result)
+      end
     end
   end
 end

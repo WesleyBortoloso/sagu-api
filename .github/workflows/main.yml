@@ -84,7 +84,7 @@ jobs:
             uname -a
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-  deploy:
+    deploy:
     needs: connect
     runs-on: ubuntu-latest
 
@@ -100,13 +100,21 @@ jobs:
           script: |
             echo "Indo para a pasta da aplicação..."
             cd /home/ubuntu/sagu-api || { echo "Diretório não encontrado"; exit 1; }
+
             echo "Atualizando imagens..."
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
+
             echo "Derrubando containers antigos..."
             docker compose -f docker-compose.api.yml down
             docker compose -f docker-compose.nginx.yml down
+
             echo "Subindo containers atualizados..."
             docker compose -f docker-compose.api.yml up -d
             docker compose -f docker-compose.nginx.yml up -d
-            echo "Deploy finalizado!"
+
+            echo "Executando migrations no container da API..."
+            docker compose -f docker-compose.api.yml exec -T web rails db:migrate
+
+            echo "Deploy e migrations finalizados!"
+

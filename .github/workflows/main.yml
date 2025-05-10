@@ -37,7 +37,7 @@ jobs:
 
   build_nginx:
     runs-on: ubuntu-latest
-    needs: build_api  # Certificando-se que o build da API foi concluído antes de iniciar o build do NGINX
+    needs: build_api
 
     steps:
       - name: Checkout code
@@ -66,8 +66,7 @@ jobs:
           docker push 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
   connect:
-    needs: [build_api, build_nginx]  # Espera o build de ambos os containers
-
+    needs: [build_api, build_nginx]
     runs-on: ubuntu-latest
 
     steps:
@@ -84,7 +83,7 @@ jobs:
             uname -a
             aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 042704722049.dkr.ecr.us-east-1.amazonaws.com
 
-    deploy:
+  deploy:
     needs: connect
     runs-on: ubuntu-latest
 
@@ -117,4 +116,3 @@ jobs:
             docker compose -f docker-compose.api.yml exec -T web rails db:migrate
 
             echo "Deploy e migrations finalizados!"
-

@@ -104,6 +104,9 @@ jobs:
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-api:latest
             docker pull 042704722049.dkr.ecr.us-east-1.amazonaws.com/sagu-nginx:latest
 
+            echo "Limpando imagens antigas não utilizadas..."
+            docker image prune -a -f
+
             echo "Derrubando containers antigos..."
             docker compose -f docker-compose.api.yml down
             docker compose -f docker-compose.nginx.yml down

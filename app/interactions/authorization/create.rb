@@ -1,5 +1,5 @@
 class Authorization::Create < BaseInteraction
-  attr_reader :authorization, :event
+  attr_reader :authorization, :event, :student
 
   def call
     fetch_student!

@@ -5,9 +5,9 @@ class Schedule < ApplicationRecord
   has_many :events, as: :eventable, dependent: :destroy
 
   enum :area, {
-    academic: 'Acadêmica',
-    administrative: 'Administrativa',
-    pedagogic: 'Pedagógica'
+    academic: 'academic',
+    administrative: 'administrative',
+    pedagogic: 'pedagogic'
   }
 
   enum :status, {

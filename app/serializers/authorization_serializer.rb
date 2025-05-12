@@ -5,4 +5,5 @@ class AuthorizationSerializer
 
   belongs_to :student
   belongs_to :parent
+  has_many :events
 end

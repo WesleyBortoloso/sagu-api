@@ -45,7 +45,7 @@ class V1::Authorizations < Grape::API
 
         present AuthorizationSerializer.new(
           authorization,
-          include: [:student, :parent]
+          include: [:student, :parent, :events]
         )
       end
 

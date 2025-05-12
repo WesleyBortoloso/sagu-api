@@ -15,7 +15,8 @@ class Orientation < ApplicationRecord
   enum :area, {
     academic: 'academic',
     administrative: 'administrative',
-    pedagogic: 'pedagogic'
+    pedagogic: 'pedagogic',
+    health: 'health'
   }
 
   validate :valid_relator_responsible

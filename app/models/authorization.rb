@@ -1,6 +1,7 @@
 class Authorization < ApplicationRecord
   belongs_to :student, class_name: 'Student'
   belongs_to :parent, class_name: 'Parent'
+  has_many :events, as: :eventable, dependent: :destroy
 
   enum :status, {
     pending: 'pending',

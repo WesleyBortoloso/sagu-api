@@ -14,7 +14,7 @@ class V1::Occurrencies < Grape::API
   resource :occurrencies do
     desc 'List all occurrencies'
     get do
-      scope = apply_filters(Occurrency.all.order(created_at: :desc), %i[kind area status student_id])
+      scope = apply_filters(OccurrencyPolicy.new(current_user).resolve.order(created_at: :desc), %i[kind area status student_id])
       occurrencies, meta = apply_pagination(scope)
 
       present serialize(occurrencies, meta)
@@ -29,6 +29,7 @@ class V1::Occurrencies < Grape::API
       requires :severity, type: String, values: Occurrency.severities.keys, desc: "Ocurrency severity"
       requires :student_id, type: String, desc: "Related student"
       requires :responsible_id, type: String, desc: "Related responsible"
+      optional :private, type: Boolean, default: false, desc: "Indicates if occurrency is private or not"
     end
 
     post do

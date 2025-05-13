@@ -6,6 +6,6 @@ class Staff < User
                  role: :string,
                  department: :string
 
-  validates :department, presence: true
+  validates :role, presence: true
 
 end

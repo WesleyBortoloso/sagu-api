@@ -14,7 +14,7 @@ class V1::Orientations < Grape::API
   resource :orientations do
     desc 'List all orientations'
     get do
-      scope = apply_filters(Orientation.all.order(created_at: :desc), %i[area status student_id])
+      scope = apply_filters(OrientationPolicy.new(current_user).resolve.order(created_at: :desc), %i[area status student_id])
       orientations, meta = apply_pagination(scope)
 
       present serialize(orientations, meta)

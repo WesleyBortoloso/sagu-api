@@ -20,7 +20,7 @@ class Occurrency::Create < BaseInteraction
 
   def occurrency_params
     params.slice(
-      :title, :description, :kind, :area, :severity, :status, :student_id, :responsible_id
+      :title, :description, :kind, :area, :severity, :status, :student_id, :responsible_id, :private
     )
   end
 

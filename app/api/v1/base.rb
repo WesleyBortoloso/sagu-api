@@ -15,5 +15,6 @@ module V1
     mount V1::Conditions
     mount V1::Users
     mount V1::PushTokens
+    mount V1::Announcements
   end
 end

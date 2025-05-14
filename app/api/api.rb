@@ -38,7 +38,15 @@ class Api < Grape::API
     def valid_api_key?
       headers['X-API-KEY'] == ENV['MY_API_KEY']
     end
-  end  
+  end
+
+  helpers do
+    def require_manager!
+      unless current_user.is_a?(Staff) && current_user.role_manager?
+        error!({ error: "Somente gestores podem realizar essa ação" }, 403)
+      end
+    end
+  end
 
   mount V1::Base
 end

@@ -3,5 +3,5 @@ class Classroom < ApplicationRecord
   has_many :classrooms_teachers, dependent: :destroy
   has_many :teachers, through: :classrooms_teachers, source: :teacher
 
-  validates :name, :grade, :year, presence: true
+  validates :name, :grade, :year, :course, presence: true
 end

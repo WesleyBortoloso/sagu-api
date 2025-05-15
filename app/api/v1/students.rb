@@ -81,7 +81,6 @@ class V1::Students < Grape::API
         requires :student_id, type: String, desc: 'Student UUID'
         optional :email, type: String, desc: 'Student email', regexp: URI::MailTo::EMAIL_REGEXP
         optional :situation, type: String, values: Student.situations.keys, desc: 'Student situation'
-        optional :classroom_id, type: String, desc: 'Student classroom'
         optional :phone, type: String, desc: 'Student phone', regexp: /^\d{10,11}$/
       end
     

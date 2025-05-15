@@ -17,7 +17,6 @@ class Student::Update < BaseInteraction
   def update_student!
     student.assign_attributes(
       email: params[:email],
-      classroom_id: params[:classroom_id],
       phone: params[:phone]
     )
   

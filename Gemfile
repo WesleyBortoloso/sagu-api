@@ -15,6 +15,7 @@ gem 'bootsnap', require: false
 gem 'dotenv-rails'
 
 gem 'jsonapi-serializer'
+gem 'image_processing', '~> 1.2'
 
 gem 'rack-cors'
 gem 'rack-attack'

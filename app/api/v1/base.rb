@@ -1,5 +1,9 @@
 module V1
   class Base < Grape::API
+    before do
+      error!('Unauthorized - Invalid API Key', 401) unless valid_api_key?
+    end
+
     mount V1::Auth
     mount V1::Occurrencies
     mount V1::Students

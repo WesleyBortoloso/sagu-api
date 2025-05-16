@@ -21,7 +21,7 @@ class Student::GenerateReport < BaseInteraction
     io.set_encoding('BINARY') if io.respond_to?(:set_encoding)
     io.rewind
 
-    student.report_file.attach(
+    @student.report_file.attach(
       io: io,
       filename: "relatorio_aluno_#{student.id}.pdf",
       content_type: 'application/pdf'

@@ -1,0 +1,51 @@
+pt-BR:
+  activerecord:
+    attributes:
+      student:
+        situation:
+          active: "Ativo"
+          inactive: "Inativo"
+      occurrency:
+        status:
+          open: "Aberta"
+          in_progress: "Em progresso"
+          resolved: "Resolvida"
+          closed: "Fechada"
+        severity:
+          normal: "Normal"
+          medium: "Média"
+          high: "Alta"
+        kind:
+          health: "Saúde"
+          discipline: "Disciplina"
+          administrative: "Administrativa"
+          other: "Outra"
+      orientation:
+        status:
+          open: "Aberta"
+          in_progress: "Em progresso"
+          resolved: "Resolvida"
+          closed: "Fechada"
+        area:
+          pedagogic: "Pedagógica"
+          health: "Saúde"
+          administrative: "Administrativa"
+          academic: "Acadêmica"
+      schedule:
+        status:
+          confirmed: "Confirmado"
+          rejected: "Rejeitada"
+          waiting: "Aguardando"
+        area:
+          academic: "Acadêmica"
+          pedagogic: "Pedagógica"
+          administrative: "Administrativa"
+      authorization:
+        status:
+          approved: "Concedida"
+          pending: "Pendente"
+          refused: "Negada"
+      condition:
+        category:
+          scholarship: "Bolsa escolar"
+          special_need: "Necessidade especial"

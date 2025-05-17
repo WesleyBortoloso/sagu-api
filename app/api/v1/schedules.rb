@@ -14,7 +14,7 @@ class V1::Schedules < Grape::API
   resource :schedules do
     desc 'List all schedules'
     get do
-      scope = apply_filters(Schedule.all.order(starts_at: :asc), %i[area status starts_at student_id])
+      scope = apply_filters(SchedulePolicy.new(current_user).resolve.order(starts_at: :asc), %i[area status starts_at student_id])
       schedules, meta = apply_pagination(scope)
 
       present serialize(schedules, meta)

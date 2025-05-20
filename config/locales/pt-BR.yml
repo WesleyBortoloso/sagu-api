@@ -1,5 +1,12 @@
 pt-BR:
   activerecord:
+    models:
+      student: "Aluno"
+      occurrency: "Ocorrência"
+      orientation: "Orientação"
+      schedule: "Agendamento"
+      authorization: "Autorização"
+      condition: "Condição"
     attributes:
       student:
         situation:

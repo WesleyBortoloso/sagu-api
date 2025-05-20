@@ -1,4 +1,6 @@
 class UpdateEventDescriptionFactory
+  include TranslationHelper
+
   def self.call(resource:, changed_fields:)
     case changed_fields.first
     when "status"

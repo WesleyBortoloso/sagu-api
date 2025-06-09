@@ -12,7 +12,7 @@ class V1::Orientations < Grape::API
   end
 
   resource :orientations do
-    desc 'List all orientations'
+    desc "List all orientations"
     get do
       scope = apply_filters(OrientationPolicy.new(current_user).resolve.order(created_at: :desc), %i[area status student_id])
       orientations, meta = apply_pagination(scope)
@@ -37,7 +37,7 @@ class V1::Orientations < Grape::API
     end
 
     route_param :orientation_id do
-      desc 'Show details of a specific orientation'
+      desc "Show details of a specific orientation"
       params do
         requires :orientation_id, type: String, desc: 'Orientation UUID'
       end

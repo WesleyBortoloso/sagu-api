@@ -13,7 +13,7 @@ class V1::Parents < Grape::API
   end
 
   resource :parents do
-    desc 'Create new parent'
+    desc "Create new parent"
     params do
       requires :name, type: String, desc: "The parent name"
       requires :email, type: String, desc: "The parent email", regexp: URI::MailTo::EMAIL_REGEXP

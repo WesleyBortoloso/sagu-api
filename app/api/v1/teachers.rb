@@ -13,7 +13,7 @@ class V1::Teachers < Grape::API
   end
 
   resource :teachers do
-    desc 'Create new teacher'
+    desc "Create new teacher"
     params do
       requires :name, type: String, desc: "The teacher name"
       requires :email, type: String, desc: "The teacher email", regexp: URI::MailTo::EMAIL_REGEXP

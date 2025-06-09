@@ -12,7 +12,7 @@ class V1::Classrooms < Grape::API
   end
 
   resource :classrooms do
-    desc 'List all classrooms'
+    desc "List all classrooms"
     get do
       scope = apply_filters(Classroom.all, %i[year name grade])
       classrooms, meta = apply_pagination(scope)

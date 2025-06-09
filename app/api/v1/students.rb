@@ -13,7 +13,7 @@ class V1::Students < Grape::API
   end
 
   resource :students do
-    desc 'Create new student'
+    desc "Create new student"
     params do
       requires :name, type: String, desc: "The student name"
       requires :email, type: String, desc: "The student email", regexp: URI::MailTo::EMAIL_REGEXP
@@ -51,9 +51,9 @@ class V1::Students < Grape::API
     route_param :student_id do
       mount V1::Students::Documents
 
-      desc 'Show details of a specific student'
+      desc "Show details of a specific student"
       params do
-        requires :student_id, type: String, desc: 'Student UUID'
+        requires :student_id, type: String, desc: "Student UUID"
       end
 
       get do
@@ -65,12 +65,12 @@ class V1::Students < Grape::API
         )
       end
 
-      desc 'Generate student report as PDF'
+      desc "Generate student report as PDF"
       params do
-        requires :student_id, type: String, desc: 'Student UUID'
+        requires :student_id, type: String, desc: "Student UUID"
       end
 
-      post '/report' do
+      post "/report" do
         result = Student::GenerateReport.call(declared(params))
       
         present StudentSerializer.new(result)
@@ -78,10 +78,10 @@ class V1::Students < Grape::API
 
       desc "Update an student"
       params do
-        requires :student_id, type: String, desc: 'Student UUID'
-        optional :email, type: String, desc: 'Student email', regexp: URI::MailTo::EMAIL_REGEXP
-        optional :situation, type: String, values: Student.situations.keys, desc: 'Student situation'
-        optional :phone, type: String, desc: 'Student phone', regexp: /^\d{10,11}$/
+        requires :student_id, type: String, desc: "Student UUID"
+        optional :email, type: String, desc: "Student email", regexp: URI::MailTo::EMAIL_REGEXP
+        optional :situation, type: String, values: Student.situations.keys, desc: "Student situation"
+        optional :phone, type: String, desc: "Student phone", regexp: /^\d{10,11}$/
       end
     
       patch do

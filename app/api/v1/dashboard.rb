@@ -2,7 +2,7 @@ class V1::Dashboard < Grape::API
   include UserAuthenticated
 
   resource :dashboard do
-    desc 'Return global statistics for dashboard'
+    desc "Return global statistics for dashboard"
     get :stats do
       {
         total_students: Student.count,

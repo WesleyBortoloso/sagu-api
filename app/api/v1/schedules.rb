@@ -12,7 +12,7 @@ class V1::Schedules < Grape::API
   end
 
   resource :schedules do
-    desc 'List all schedules'
+    desc "List all schedules"
     get do
       scope = apply_filters(SchedulePolicy.new(current_user).resolve.order(starts_at: :asc), %i[area status starts_at student_id])
       schedules, meta = apply_pagination(scope)
@@ -50,9 +50,9 @@ class V1::Schedules < Grape::API
     end
 
     route_param :schedule_id do
-      desc 'Show details of a specific schedule'
+      desc "Show details of a specific schedule"
       params do
-        requires :schedule_id, type: String, desc: 'Schedule UUID'
+        requires :schedule_id, type: String, desc: "Schedule UUID"
       end
 
       get do
@@ -66,9 +66,9 @@ class V1::Schedules < Grape::API
 
       desc "Update an schedule"
       params do
-        requires :schedule_id, type: String, desc: 'Schedule UUID'
-        optional :area, type: String, values: Schedule.areas.keys, desc: 'Schedule area'
-        optional :status, type: String, values: Schedule.statuses.keys, desc: 'Schedule status'
+        requires :schedule_id, type: String, desc: "Schedule UUID"
+        optional :area, type: String, values: Schedule.areas.keys, desc: "Schedule area"
+        optional :status, type: String, values: Schedule.statuses.keys, desc: "Schedule status"
       end
     
       patch do

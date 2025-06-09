@@ -10,12 +10,12 @@ module V1
     end
 
     resource :auth do
-      desc 'User login', {
-        success: { model: UserSerializer, message: 'Token generated successfuly' }
+      desc "User login", {
+        success: { model: UserSerializer, message: "Token generated successfuly" }
       }
       params do
-        requires :email, type: String, desc: 'User email'
-        requires :password, type: String, desc: 'User password'
+        requires :email, type: String, desc: "User email"
+        requires :password, type: String, desc: "User password"
       end
 
       post :login do
@@ -27,7 +27,7 @@ module V1
         }
       end
 
-      desc 'Logout user'
+      desc "Logout user"
       delete :logout do
         raise Errors::MissingUser unless current_user
         env['warden'].logout

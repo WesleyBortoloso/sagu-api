@@ -12,7 +12,7 @@ class V1::Events < Grape::API
   end
 
   resource :events do
-    desc 'List all events'
+    desc "List all events"
     get do
       current_user_events = Event.where("author_id = :id OR target_id = :id", id: current_user.id)
                                  .order(created_at: :desc)
@@ -35,7 +35,7 @@ class V1::Events < Grape::API
       present EventSerializer.new(result)
     end
 
-    desc 'List notifications'
+    desc "List notifications"
     get :notifications do
       events = Event.where(target: current_user)
                     .order(created_at: :desc)

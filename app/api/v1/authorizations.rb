@@ -35,9 +35,9 @@ class V1::Authorizations < Grape::API
     end
 
     route_param :authorization_id do
-      desc 'Show details of a specific authorization'
+      desc "Show details of a specific authorization"
       params do
-        requires :authorization_id, type: String, desc: 'Authorization UUID'
+        requires :authorization_id, type: String, desc: "Authorization UUID"
       end
 
       get do
@@ -51,8 +51,8 @@ class V1::Authorizations < Grape::API
 
       desc "Update an authorization"
       params do
-        requires :authorization_id, type: String, desc: 'Authorization UUID'
-        optional :status, type: String, values: Authorization.statuses.keys, desc: 'Authorization status'
+        requires :authorization_id, type: String, desc: "Authorization UUID"
+        optional :status, type: String, values: Authorization.statuses.keys, desc: "Authorization status"
       end
 
       patch do

@@ -13,7 +13,7 @@ class V1::Staffs < Grape::API
   end
 
   resource :staffs do
-    desc 'Create new staff'
+    desc "Create new staff"
     params do
       requires :name, type: String, desc: "The staff name"
       requires :email, type: String, desc: "The staff email", regexp: URI::MailTo::EMAIL_REGEXP

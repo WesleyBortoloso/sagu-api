@@ -12,7 +12,7 @@ class V1::Occurrencies < Grape::API
   end
 
   resource :occurrencies do
-    desc 'List all occurrencies'
+    desc "List all occurrencies"
     get do
       scope = apply_filters(OccurrencyPolicy.new(current_user).resolve.order(created_at: :desc), %i[kind area status student_id])
       occurrencies, meta = apply_pagination(scope)
@@ -41,7 +41,7 @@ class V1::Occurrencies < Grape::API
     end
 
     route_param :occurrency_id do
-      desc 'Show details of a specific occurrency'
+      desc "Show details of a specific occurrency"
       params do
         requires :occurrency_id, type: String, desc: 'Occurrency UUID'
       end
